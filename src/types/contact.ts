@@ -19,19 +19,18 @@ export interface Contact {
   location?: string;
   job?: string;
   notes?: string;
-  lastEngagement?: string;
-  lastEngagementType?: EngagementType;
-  engagementScore: number;
   children?: string[];
-  imageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-  engagements: Engagement[];
-  // New fields
+  image_url?: string;
+  engagement_score: number;
+  last_engagement?: string;
+  last_engagement_type?: EngagementType;
   hobbies?: string[];
-  favoriteMovies?: string[];
-  favoriteTVShows?: string[];
-  favoriteMusicArtists?: string[];
-  favoriteFoods?: string[];
-  favoriteDrinks?: string[];
+  favorite_movies?: string[];
+  favorite_tv_shows?: string[];
+  favorite_music_artists?: string[];
+  favorite_foods?: string[];
+  favorite_drinks?: string[];
+  created_at: string;
+  updated_at: string;
+  engagements?: Engagement[];
 }
