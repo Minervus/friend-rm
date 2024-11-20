@@ -34,9 +34,9 @@ function ContactCard({ contact, showBirthday, showLastEngagement }: ContactCardP
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-              {contact.imageUrl ? (
+              {contact.image_url ? (
                 <img
-                  src={contact.imageUrl}
+                  src={contact.image_url}
                   alt={contact.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -60,12 +60,12 @@ function ContactCard({ contact, showBirthday, showLastEngagement }: ContactCardP
           <div className="flex flex-col items-end">
             <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
-                className={`h-full ${getProgressColor(contact.engagementScore)} transition-all duration-300`}
-                style={{ width: `${contact.engagementScore}%` }}
+                className={`h-full ${getProgressColor(contact.engagement_score)} transition-all duration-300`}
+                style={{ width: `${contact.engagement_score}%` }}
               />
             </div>
             <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {contact.engagementScore}%
+              {contact.engagement_score}%
             </span>
           </div>
         </div>
@@ -91,12 +91,12 @@ function ContactCard({ contact, showBirthday, showLastEngagement }: ContactCardP
               </span>
             </div>
           )}
-          {showLastEngagement && contact.lastEngagement && (
+          {showLastEngagement && contact.last_engagement && (
             <div className="flex items-center text-gray-600 dark:text-gray-300">
               <Clock className="w-4 h-4 mr-2" />
               <span className="text-sm">
                 Last contact:{' '}
-                {formatDistanceToNow(parseISO(contact.lastEngagement), {
+                {formatDistanceToNow(parseISO(contact.last_engagement), {
                   addSuffix: true,
                 })}
               </span>

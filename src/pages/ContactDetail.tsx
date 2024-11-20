@@ -49,42 +49,66 @@ function ContactDetail() {
       setEngagementForm({ type: 'in-person', notes: '' });
     }
   };
+  const getProgressColor = (score: number) => {
+    if (score < 30) return 'bg-red-500';
+    if (score < 60) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">{contact.name}</h1>
-        <div className="flex space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
-              >
-                <Save className="w-5 h-5" />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
-          )}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">{contact.name}</h1>
+        {!isEditing && (
+          <div className="flex items-center space-x-4 mb-6">
+            {contact.image_url ? (
+              <img
+                src={contact.image_url}
+                alt={`${contact.name}'s profile`}
+                className="h-24 w-24 rounded-full object-cover border-2 border-gray-200"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/96?text=NA';
+                }}
+              />
+            ) : (
+              <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-2xl text-gray-500">
+                  {contact.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col items-start">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Engagement Score</h3>
+        <div className="w-full max-w-xs h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className={`h-full ${getProgressColor(contact.engagement_score)} transition-all duration-300`}
+            style={{ width: `${contact.engagement_score}%` }}
+          />
         </div>
+        <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {contact.engagement_score}%
+        </span>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6">
         {isEditing ? (
           <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Profile Image URL</label>
+                <input
+                  type="text"
+                  value={editForm?.image_url || ''}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm!, image_url: e.target.value })
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Name</label>
                 <input
@@ -96,6 +120,7 @@ function ContactDetail() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>
                 <input
@@ -183,11 +208,11 @@ function ContactDetail() {
                 <label className="block text-sm font-medium text-gray-700">Favorite Movies</label>
                 <input
                   type="text"
-                  value={editForm?.favoriteMovies?.join(', ') || ''}
+                  value={editForm?.favorite_movies?.join(', ') || ''}
                   onChange={(e) =>
                     setEditForm({
                       ...editForm!,
-                      favoriteMovies: e.target.value.split(',').map((s) => s.trim()),
+                      favorite_movies: e.target.value.split(',').map((s) => s.trim()),
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -197,11 +222,11 @@ function ContactDetail() {
                 <label className="block text-sm font-medium text-gray-700">Favorite TV Shows</label>
                 <input
                   type="text"
-                  value={editForm?.favoriteTVShows?.join(', ') || ''}
+                  value={editForm?.favorite_tv_shows?.join(', ') || ''}
                   onChange={(e) =>
                     setEditForm({
                       ...editForm!,
-                      favoriteTVShows: e.target.value.split(',').map((s) => s.trim()),
+                      favorite_tv_shows: e.target.value.split(',').map((s) => s.trim()),
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -211,11 +236,11 @@ function ContactDetail() {
                 <label className="block text-sm font-medium text-gray-700">Favorite Music Artists</label>
                 <input
                   type="text"
-                  value={editForm?.favoriteMusicArtists?.join(', ') || ''}
+                  value={editForm?.favorite_music_artists?.join(', ') || ''}
                   onChange={(e) =>
                     setEditForm({
                       ...editForm!,
-                      favoriteMusicArtists: e.target.value.split(',').map((s) => s.trim()),
+                      favorite_music_artists: e.target.value.split(',').map((s) => s.trim()),
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -225,11 +250,11 @@ function ContactDetail() {
                 <label className="block text-sm font-medium text-gray-700">Favorite Foods</label>
                 <input
                   type="text"
-                  value={editForm?.favoriteFoods?.join(', ') || ''}
+                  value={editForm?.favorite_foods?.join(', ') || ''}
                   onChange={(e) =>
                     setEditForm({
                       ...editForm!,
-                      favoriteFoods: e.target.value.split(',').map((s) => s.trim()),
+                      favorite_foods: e.target.value.split(',').map((s) => s.trim()),
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -239,11 +264,11 @@ function ContactDetail() {
                 <label className="block text-sm font-medium text-gray-700">Favorite Drinks</label>
                 <input
                   type="text"
-                  value={editForm?.favoriteDrinks?.join(', ') || ''}
+                  value={editForm?.favorite_drinks?.join(', ') || ''}
                   onChange={(e) =>
                     setEditForm({
                       ...editForm!,
-                      favoriteDrinks: e.target.value.split(',').map((s) => s.trim()),
+                      favorite_drinks: e.target.value.split(',').map((s) => s.trim()),
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -264,10 +289,16 @@ function ContactDetail() {
           </form>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+            {/* First section: Contact Info and Preferences */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+                      <p className="text-sm text-gray-500">{contact.name}</p>
+                    </div>
+                  </div>
                   <dl className="mt-2 space-y-2">
                     {contact.email && (
                       <div>
@@ -311,6 +342,7 @@ function ContactDetail() {
                     )}
                   </dl>
                 </div>
+        
 
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Preferences</h2>
@@ -323,54 +355,58 @@ function ContactDetail() {
                         </dd>
                       </div>
                     )}
-                    {contact.favoriteMovies && contact.favoriteMovies.length > 0 && (
+                    {contact.favorite_movies && contact.favorite_movies.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">Favorite Movies</dt>
                         <dd className="text-sm text-gray-900">
-                          {contact.favoriteMovies.join(', ')}
+                          {contact.favorite_movies.join(', ')}
                         </dd>
                       </div>
                     )}
-                    {contact.favoriteTVShows && contact.favoriteTVShows.length > 0 && (
+                    {contact.favorite_tv_shows && contact.favorite_tv_shows.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">Favorite TV Shows</dt>
                         <dd className="text-sm text-gray-900">
-                          {contact.favoriteTVShows.join(', ')}
+                          {contact.favorite_tv_shows.join(', ')}
                         </dd>
                       </div>
                     )}
-                    {contact.favoriteMusicArtists && contact.favoriteMusicArtists.length > 0 && (
+                    {contact.favorite_music_artists && contact.favorite_music_artists.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">Favorite Music Artists</dt>
                         <dd className="text-sm text-gray-900">
-                          {contact.favoriteMusicArtists.join(', ')}
+                          {contact.favorite_music_artists.join(', ')}
                         </dd>
                       </div>
                     )}
-                    {contact.favoriteFoods && contact.favoriteFoods.length > 0 && (
+                    {contact.favorite_foods && contact.favorite_foods.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">Favorite Foods</dt>
                         <dd className="text-sm text-gray-900">
-                          {contact.favoriteFoods.join(', ')}
+                          {contact.favorite_foods.join(', ')}
                         </dd>
                       </div>
                     )}
-                    {contact.favoriteDrinks && contact.favoriteDrinks.length > 0 && (
+                    {contact.favorite_drinks && contact.favorite_drinks.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500">Favorite Drinks</dt>
                         <dd className="text-sm text-gray-900">
-                          {contact.favoriteDrinks.join(', ')}
+                          {contact.favorite_drinks.join(', ')}
                         </dd>
                       </div>
                     )}
                   </dl>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900">Notes & Engagement</h2>
+            {/* Second section: Notes & Engagement and History */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              {/* Notes & Engagement */}
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes & Engagement</h2>
                 {contact.notes && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
                     <p className="text-gray-700">{contact.notes}</p>
                   </div>
                 )}
@@ -421,48 +457,48 @@ function ContactDetail() {
                   </form>
                 </div>
               </div>
-            </div>
 
-            {/* Engagement History section */}
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Engagement History</h2>
-              <div className="bg-gray-50 rounded-lg overflow-hidden">
-                {contact.engagements.length > 0 ? (
-                  <div className="divide-y divide-gray-200">
-                    {contact.engagements.map((engagement) => (
-                      <div key={engagement.id} className="p-4 hover:bg-gray-100 transition-colors duration-150">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              engagement.type === 'in-person'
-                                ? 'bg-green-100 text-green-800'
-                                : engagement.type === 'video-call'
-                                ? 'bg-blue-100 text-blue-800'
-                                : engagement.type === 'online-message'
-                                ? 'bg-purple-100 text-purple-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {engagement.type.replace('-', ' ')}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {format(parseISO(engagement.date), 'MMM d, yyyy h:mm a')}
+              {/* Engagement History */}
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Engagement History</h2>
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  {contact.engagements.length > 0 ? (
+                    <div className="divide-y divide-gray-200">
+                      {contact.engagements.map((engagement) => (
+                        <div key={engagement.id} className="p-4 hover:bg-gray-100 transition-colors duration-150">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                engagement.type === 'in-person'
+                                  ? 'bg-green-100 text-green-800'
+                                  : engagement.type === 'video-call'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : engagement.type === 'online-message'
+                                  ? 'bg-purple-100 text-purple-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {engagement.type.replace('-', ' ')}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                {format(parseISO(engagement.date), 'MMM d, yyyy h:mm a')}
+                              </span>
+                            </div>
+                            <span className="text-sm font-medium text-indigo-600">
+                              +{engagement.points} points
                             </span>
                           </div>
-                          <span className="text-sm font-medium text-indigo-600">
-                            +{engagement.points} points
-                          </span>
+                          {engagement.notes && (
+                            <p className="text-sm text-gray-600 mt-1">{engagement.notes}</p>
+                          )}
                         </div>
-                        {engagement.notes && (
-                          <p className="text-sm text-gray-600 mt-1">{engagement.notes}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-gray-500">
-                    No engagement history yet
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 text-center text-gray-500">
+                      No engagement history yet
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </>

@@ -20,8 +20,8 @@ function Dashboard() {
 
   // Filter contacts that need attention (engagement score <= 50)
   const needAttention = contacts
-    .filter((contact) => contact.engagementScore <= 50)
-    .sort((a, b) => a.engagementScore - b.engagementScore);
+    .filter((contact) => contact.engagement_score <= 50)
+    .sort((a, b) => a.engagement_score - b.engagement_score);
 
   const getProgressColor = (score: number) => {
     if (score < 30) return 'bg-red-500';
@@ -103,12 +103,12 @@ function Dashboard() {
                           <div className="mt-1 flex items-center">
                             <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                               <div
-                                className={`h-full ${getProgressColor(contact.engagementScore)} transition-all duration-300`}
-                                style={{ width: `${contact.engagementScore}%` }}
+                                className={`h-full ${getProgressColor(contact.engagement_score)} transition-all duration-300`}
+                                style={{ width: `${contact.engagement_score}%` }}
                               />
                             </div>
                             <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                              {contact.engagementScore}%
+                              {contact.engagement_score}%
                             </span>
                           </div>
                         </div>

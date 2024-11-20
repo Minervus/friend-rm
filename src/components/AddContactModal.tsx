@@ -21,11 +21,11 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
     notes: '',
     children: '',
     hobbies: '',
-    favoriteMovies: '',
-    favoriteTVShows: '',
-    favoriteMusicArtists: '',
-    favoriteFoods: '',
-    favoriteDrinks: '',
+    favorite_movies: '',
+    favorite_tv_shows: '',
+    favorite_music_artists: '',
+    favorite_foods: '',
+    favorite_drinks: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,11 +34,14 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
       ...formData,
       children: formData.children ? formData.children.split(',').map(s => s.trim()) : undefined,
       hobbies: formData.hobbies ? formData.hobbies.split(',').map(s => s.trim()) : undefined,
-      favoriteMovies: formData.favoriteMovies ? formData.favoriteMovies.split(',').map(s => s.trim()) : undefined,
-      favoriteTVShows: formData.favoriteTVShows ? formData.favoriteTVShows.split(',').map(s => s.trim()) : undefined,
-      favoriteMusicArtists: formData.favoriteMusicArtists ? formData.favoriteMusicArtists.split(',').map(s => s.trim()) : undefined,
-      favoriteFoods: formData.favoriteFoods ? formData.favoriteFoods.split(',').map(s => s.trim()) : undefined,
-      favoriteDrinks: formData.favoriteDrinks ? formData.favoriteDrinks.split(',').map(s => s.trim()) : undefined,
+      favorite_movies: formData.favorite_movies ? formData.favorite_movies.split(',').map(s => s.trim()) : undefined,
+      favorite_tv_shows: formData.favorite_tv_shows ? formData.favorite_tv_shows.split(',').map(s => s.trim()) : undefined,
+      favorite_music_artists: formData.favorite_music_artists ? formData.favorite_music_artists.split(',').map(s => s.trim()) : undefined,
+      favorite_foods: formData.favorite_foods ? formData.favorite_foods.split(',').map(s => s.trim()) : undefined,
+      favorite_drinks: formData.favorite_drinks ? formData.favorite_drinks.split(',').map(s => s.trim()) : undefined,
+      engagement_score: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     });
     onClose();
     setFormData({
@@ -52,11 +55,11 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
       notes: '',
       children: '',
       hobbies: '',
-      favoriteMovies: '',
-      favoriteTVShows: '',
-      favoriteMusicArtists: '',
-      favoriteFoods: '',
-      favoriteDrinks: '',
+      favorite_movies: '',
+      favorite_tv_shows: '',
+      favorite_music_artists: '',
+      favorite_foods: '',
+      favorite_drinks: '',
     });
   };
 
@@ -226,9 +229,9 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
               <input
                 type="text"
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                value={formData.favoriteMovies}
+                value={formData.favorite_movies}
                 onChange={(e) =>
-                  setFormData({ ...formData, favoriteMovies: e.target.value })
+                  setFormData({ ...formData, favorite_movies: e.target.value })
                 }
                 placeholder="e.g. The Godfather, Inception"
               />
@@ -241,9 +244,9 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
               <input
                 type="text"
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                value={formData.favoriteTVShows}
+                value={formData.favorite_tv_shows}
                 onChange={(e) =>
-                  setFormData({ ...formData, favoriteTVShows: e.target.value })
+                  setFormData({ ...formData, favorite_tv_shows: e.target.value })
                 }
                 placeholder="e.g. Breaking Bad, The Office"
               />
@@ -256,9 +259,9 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
               <input
                 type="text"
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                value={formData.favoriteMusicArtists}
+                value={formData.favorite_music_artists}
                 onChange={(e) =>
-                  setFormData({ ...formData, favoriteMusicArtists: e.target.value })
+                  setFormData({ ...formData, favorite_music_artists: e.target.value })
                 }
                 placeholder="e.g. The Beatles, Queen"
               />
@@ -271,9 +274,9 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
               <input
                 type="text"
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                value={formData.favoriteFoods}
+                value={formData.favorite_foods}
                 onChange={(e) =>
-                  setFormData({ ...formData, favoriteFoods: e.target.value })
+                  setFormData({ ...formData, favorite_foods: e.target.value })
                 }
                 placeholder="e.g. Pizza, Sushi"
               />
@@ -286,9 +289,9 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
               <input
                 type="text"
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                value={formData.favoriteDrinks}
+                value={formData.favorite_drinks}
                 onChange={(e) =>
-                  setFormData({ ...formData, favoriteDrinks: e.target.value })
+                  setFormData({ ...formData, favorite_drinks: e.target.value })
                 }
                 placeholder="e.g. Coffee, Green Tea"
               />

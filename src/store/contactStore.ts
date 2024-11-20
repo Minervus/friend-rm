@@ -74,9 +74,11 @@ export const useContactStore = create<ContactState>((set, get) => ({
 
   updateContact: async (id, updatedData) => {
     try {
+      const { engagements, ...dataToUpdate } = updatedData;
+
       const { error } = await supabase
         .from('contacts')
-        .update(updatedData)
+        .update(dataToUpdate)
         .eq('id', id);
 
       if (error) throw error;
@@ -112,7 +114,7 @@ export const useContactStore = create<ContactState>((set, get) => ({
 
       if (engagementError) throw engagementError;
 
-      const newScore = Math.min(100, (contact.engagementScore || 0) + points);
+      const newScore = Math.min(100, (contact.engagement_score || 0) + points);
       
       const { error: updateError } = await supabase
         .from('contacts')
@@ -130,10 +132,10 @@ export const useContactStore = create<ContactState>((set, get) => ({
           c.id === id
             ? {
                 ...c,
-                engagementScore: newScore,
-                lastEngagement: new Date().toISOString(),
-                lastEngagementType: type,
-                engagements: [engagement, ...c.engagements],
+                engagement_score: newScore,
+                last_engagement: new Date().toISOString(),
+                last_engagement_type: type,
+                engagements: engagement ? [engagement, ...(c.engagements || [])] : c.engagements,
               }
             : c
         ),

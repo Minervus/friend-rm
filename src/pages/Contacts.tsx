@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import { useContactStore } from '../store/contactStore';
 import ContactCard from '../components/ContactCard';
@@ -8,10 +8,15 @@ import { RelationType } from '../types/contact';
 function Contacts() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const contacts = useContactStore((state) => state.contacts);
+  const fetchContacts = useContactStore((state) => state.fetchContacts);
   const searchQuery = useContactStore((state) => state.searchQuery);
   const relationshipFilter = useContactStore((state) => state.relationshipFilter);
   const setSearchQuery = useContactStore((state) => state.setSearchQuery);
   const setRelationshipFilter = useContactStore((state) => state.setRelationshipFilter);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
 
   const filteredContacts = contacts.filter((contact) => {
     const matchesSearch = contact.name.toLowerCase().includes(searchQuery.toLowerCase());
