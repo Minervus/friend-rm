@@ -20,6 +20,8 @@ function ContactDetail() {
   );
   const updateContact = useContactStore((state) => state.updateContact);
   const logEngagement = useContactStore((state) => state.logEngagement);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState(contact);
@@ -55,34 +57,86 @@ function ContactDetail() {
     return 'bg-green-500';
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image must be less than 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      await updateContact(contact.id, {
+        ...contact,
+        image_url: URL.createObjectURL(file)  // Temporary URL for immediate display
+      });
+
+    } catch (error) {
+      console.error('Error updating contact image:', error);
+      setUploadError('Failed to update image');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">{contact.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{contact.name}</h1>
         {!isEditing && (
           <div className="flex items-center space-x-4 mb-6">
-            {contact.image_url ? (
-              <img
-                src={contact.image_url}
-                alt={`${contact.name}'s profile`}
-                className="h-24 w-24 rounded-full object-cover border-2 border-gray-200"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://via.placeholder.com/96?text=NA';
-                }}
-              />
-            ) : (
-              <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-2xl text-gray-500">
-                  {contact.name.charAt(0).toUpperCase()}
+            <div className="relative group">
+              {contact.image_url ? (
+                <img
+                  src={contact.image_url}
+                  alt={`${contact.name}'s profile`}
+                  className="h-24 w-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://via.placeholder.com/96?text=NA';
+                  }}
+                />
+              ) : (
+                <div className="h-24 w-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <span className="text-2xl text-gray-500 dark:text-gray-400">
+                    {contact.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              
+              <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                <span className="text-white text-sm">
+                  {isUploading ? 'Uploading...' : 'Change Photo'}
                 </span>
-              </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={isUploading}
+                />
+              </label>
+            </div>
+            
+            {uploadError && (
+              <p className="text-sm text-red-500 dark:text-red-400">
+                {uploadError}
+              </p>
             )}
           </div>
         )}
       </div>
       <div className="flex flex-col items-start">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Engagement Score</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-white">Engagement Score</h3>
         <div className="w-full max-w-xs h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
             className={`h-full ${getProgressColor(contact.engagement_score)} transition-all duration-300`}
@@ -94,7 +148,7 @@ function ContactDetail() {
         </span>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         {isEditing ? (
           <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -290,52 +344,52 @@ function ContactDetail() {
         ) : (
           <>
             {/* First section: Contact Info and Preferences */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center space-x-4 mb-4">
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
-                      <p className="text-sm text-gray-500">{contact.name}</p>
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Contact Information</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{contact.name}</p>
                     </div>
                   </div>
                   <dl className="mt-2 space-y-2">
                     {contact.email && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Email</dt>
-                        <dd className="text-sm text-gray-900">{contact.email}</dd>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">{contact.email}</dd>
                       </div>
                     )}
                     {contact.phone && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                        <dd className="text-sm text-gray-900">{contact.phone}</dd>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">{contact.phone}</dd>
                       </div>
                     )}
                     {contact.birthday && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Birthday</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Birthday</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {format(parseISO(contact.birthday), 'MMMM do, yyyy')}
                         </dd>
                       </div>
                     )}
                     {contact.location && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Location</dt>
-                        <dd className="text-sm text-gray-900">{contact.location}</dd>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Location</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">{contact.location}</dd>
                       </div>
                     )}
                     {contact.job && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Job</dt>
-                        <dd className="text-sm text-gray-900">{contact.job}</dd>
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Job</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">{contact.job}</dd>
                       </div>
                     )}
                     {contact.children && contact.children.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Children</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Children</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.children.join(', ')}
                         </dd>
                       </div>
@@ -345,52 +399,52 @@ function ContactDetail() {
         
 
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Preferences</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Preferences</h2>
                   <dl className="mt-2 space-y-2">
                     {contact.hobbies && contact.hobbies.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Hobbies</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Hobbies</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.hobbies.join(', ')}
                         </dd>
                       </div>
                     )}
                     {contact.favorite_movies && contact.favorite_movies.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Favorite Movies</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Favorite Movies</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.favorite_movies.join(', ')}
                         </dd>
                       </div>
                     )}
                     {contact.favorite_tv_shows && contact.favorite_tv_shows.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Favorite TV Shows</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Favorite TV Shows</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.favorite_tv_shows.join(', ')}
                         </dd>
                       </div>
                     )}
                     {contact.favorite_music_artists && contact.favorite_music_artists.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Favorite Music Artists</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Favorite Music Artists</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.favorite_music_artists.join(', ')}
                         </dd>
                       </div>
                     )}
                     {contact.favorite_foods && contact.favorite_foods.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Favorite Foods</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Favorite Foods</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.favorite_foods.join(', ')}
                         </dd>
                       </div>
                     )}
                     {contact.favorite_drinks && contact.favorite_drinks.length > 0 && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Favorite Drinks</dt>
-                        <dd className="text-sm text-gray-900">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Favorite Drinks</dt>
+                        <dd className="text-sm text-gray-900 dark:text-gray-200">
                           {contact.favorite_drinks.join(', ')}
                         </dd>
                       </div>
@@ -401,20 +455,20 @@ function ContactDetail() {
             </div>
 
             {/* Second section: Notes & Engagement and History */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               {/* Notes & Engagement */}
               <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes & Engagement</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notes & Engagement</h2>
                 {contact.notes && (
-                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                    <p className="text-gray-700">{contact.notes}</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                    <p className="text-gray-700 dark:text-gray-300">{contact.notes}</p>
                   </div>
                 )}
                 <div className="space-y-3">
                   <form onSubmit={handleEngagement} className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Engagement Type
                         </label>
                         <select
@@ -423,7 +477,7 @@ function ContactDetail() {
                             ...engagementForm,
                             type: e.target.value as EngagementType
                           })}
-                          className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         >
                           {engagementTypes.map((type) => (
                             <option key={type.value} value={type.value}>
@@ -433,13 +487,13 @@ function ContactDetail() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Notes
                         </label>
                         <input
                           type="text"
                           placeholder="Add details about the interaction"
-                          className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                           value={engagementForm.notes}
                           onChange={(e) => setEngagementForm({
                             ...engagementForm,
@@ -450,7 +504,7 @@ function ContactDetail() {
                     </div>
                     <button
                       type="submit"
-                      className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                      className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                     >
                       Log Engagement
                     </button>
@@ -460,41 +514,41 @@ function ContactDetail() {
 
               {/* Engagement History */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Engagement History</h2>
-                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Engagement History</h2>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
                   {contact.engagements.length > 0 ? (
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-200 dark:divide-gray-600">
                       {contact.engagements.map((engagement) => (
-                        <div key={engagement.id} className="p-4 hover:bg-gray-100 transition-colors duration-150">
+                        <div key={engagement.id} className="p-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
                               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 engagement.type === 'in-person'
-                                  ? 'bg-green-100 text-green-800'
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                   : engagement.type === 'video-call'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                                   : engagement.type === 'online-message'
-                                  ? 'bg-purple-100 text-purple-800'
-                                  : 'bg-gray-100 text-gray-800'
+                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                               }`}>
                                 {engagement.type.replace('-', ' ')}
                               </span>
-                              <span className="text-sm text-gray-500">
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
                                 {format(parseISO(engagement.date), 'MMM d, yyyy h:mm a')}
                               </span>
                             </div>
-                            <span className="text-sm font-medium text-indigo-600">
+                            <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                               +{engagement.points} points
                             </span>
                           </div>
                           {engagement.notes && (
-                            <p className="text-sm text-gray-600 mt-1">{engagement.notes}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{engagement.notes}</p>
                           )}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="p-4 text-center text-gray-500">
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                       No engagement history yet
                     </div>
                   )}

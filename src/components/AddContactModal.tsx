@@ -28,9 +28,12 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
     favorite_drinks: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addContact({
+    
+    console.log('Starting contact submission...');
+    
+    const contactData = {
       ...formData,
       children: formData.children ? formData.children.split(',').map(s => s.trim()) : undefined,
       hobbies: formData.hobbies ? formData.hobbies.split(',').map(s => s.trim()) : undefined,
@@ -42,25 +45,36 @@ function AddContactModal({ isOpen, onClose }: AddContactModalProps) {
       engagement_score: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    });
-    onClose();
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      relationship: 'friend',
-      birthday: '',
-      location: '',
-      job: '',
-      notes: '',
-      children: '',
-      hobbies: '',
-      favorite_movies: '',
-      favorite_tv_shows: '',
-      favorite_music_artists: '',
-      favorite_foods: '',
-      favorite_drinks: '',
-    });
+    };
+
+    console.log('Prepared contact data:', contactData);
+
+    try {
+      const result = await addContact(contactData);
+      console.log('Contact creation result:', result);
+      
+      onClose();
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        relationship: 'friend',
+        birthday: '',
+        location: '',
+        job: '',
+        notes: '',
+        children: '',
+        hobbies: '',
+        favorite_movies: '',
+        favorite_tv_shows: '',
+        favorite_music_artists: '',
+        favorite_foods: '',
+        favorite_drinks: '',
+      });
+    } catch (error) {
+      console.error('Error creating contact:', error);
+      // Optionally add error handling UI here
+    }
   };
 
   if (!isOpen) return null;

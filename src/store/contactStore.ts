@@ -49,9 +49,22 @@ export const useContactStore = create<ContactState>((set, get) => ({
 
   addContact: async (contactData) => {
     try {
-      const { data: user } = await supabase.auth.getUser();
+      const { data: user, error: authError } = await supabase.auth.getUser();
+      if (authError) throw new Error('Authentication error: ' + authError.message);
       if (!user.user) throw new Error('No authenticated user');
 
+      console.log('User:', user.user);
+      console.log('Contact Data:', contactData);
+
+      // First, verify the table exists and we can query it
+      const { data: tableCheck, error: tableError } = await supabase
+        .from('contacts')
+        .select('*')
+        .limit(1);
+      
+      console.log('Table check:', tableCheck, tableError);
+
+      // Then attempt the insert
       const { data, error } = await supabase
         .from('contacts')
         .insert([{
@@ -61,20 +74,58 @@ export const useContactStore = create<ContactState>((set, get) => ({
         }])
         .select()
         .single();
+      console.log('Sucessfully Inserted Data:', data);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase Error:', error);
+        throw new Error('Database error: ' + error.message);
+      }
+
+      console.log('Inserted Data:', data);
+
+      // Verify the record exists after insert
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('contacts')
+        .select('*')
+        .eq('id', data.id)
+        .single();
+
+      console.log('Verify Data:', verifyData, verifyError);
 
       set((state) => ({
         contacts: [...state.contacts, { ...data, engagements: [] }],
       }));
+
+      return data; // Return the created contact
     } catch (error) {
       console.error('Error adding contact:', error);
+      throw error;
     }
   },
 
   updateContact: async (id, updatedData) => {
     try {
       const { engagements, ...dataToUpdate } = updatedData;
+
+      if (dataToUpdate.image_url && dataToUpdate.image_url.startsWith('blob:')) {
+        const response = await fetch(dataToUpdate.image_url);
+        const blob = await response.blob();
+        
+        const fileExt = blob.type.split('/')[1];
+        const fileName = `${id}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('contact-photos')
+          .upload(fileName, blob);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('contact-photos')
+          .getPublicUrl(fileName);
+
+        dataToUpdate.image_url = publicUrl;
+      }
 
       const { error } = await supabase
         .from('contacts')
@@ -92,6 +143,7 @@ export const useContactStore = create<ContactState>((set, get) => ({
       }));
     } catch (error) {
       console.error('Error updating contact:', error);
+      throw error;
     }
   },
 

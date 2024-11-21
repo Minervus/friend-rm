@@ -15,7 +15,7 @@ export interface Contact {
   email?: string;
   phone?: string;
   relationship: RelationType;
-  birthday?: string;
+  birthday?: Date;
   location?: string;
   job?: string;
   notes?: string;
